@@ -1,4 +1,4 @@
-SELECT * FROM cafe_sales_cleaned;
+
 
 -- top item sold by revenue in 2023: salad, smoothie, sandwich
 SELECT item, SUM(quantity) AS total_quantity, SUM(total_spent) AS total_revenue
