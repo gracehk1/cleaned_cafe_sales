@@ -89,13 +89,11 @@ Each fill step runs as its own `UPDATE`, so every step uses the values corrected
 ### 4.3 Cumulative performance (running totals)
 9. How does **year-to-date revenue** build up day by day and month by month?
 10. How does each product's **cumulative revenue** compare over the year — when does one product overtake another?
-11. When did the cafe (and each product) cross revenue milestones (e.g. 25%, 50%, 75% of annual revenue, or fixed targets like $25k / $50k / $75k)?
-12. Which small set of products makes up most of the revenue (**cumulative share / Pareto 80/20**)?
 
 ### 4.4 Customer behavior
-13. What is the revenue and transaction split by **payment method**, overall and per product?
-14. What is the split between **In-store** and **Takeaway**, overall and per product?
-15. Do some products sell mainly as takeaway?
+11. What is the revenue and transaction split by **payment method**, overall and per product?
+12. What is the split between **In-store** and **Takeaway**, overall and per product?
+13. Do some products sell mainly as takeaway?
 
 ## 5. Metric Definitions
 
@@ -118,10 +116,8 @@ Each fill step runs as its own `UPDATE`, so every step uses the values corrected
 The analysis must let the owner slice every metric by:
 - Product (`item`)
 - Time: day, week, month, quarter, day of week
-- Payment method (including Unknown)
-- Location (In-store / Takeaway / Unknown)
-
-NULL values are displayed as **Unknown** in every breakdown rather than hidden, so the owner can see how much of the data each split actually covers.
+- Payment method (including NULL)
+- Location (In-store / Takeaway / NULL)
 
 ## 7. Deliverables
 
@@ -129,9 +125,7 @@ NULL values are displayed as **Unknown** in every breakdown rather than hidden, 
 2. **Monthly trend table and chart:** revenue and units by month, per product and total, with month-over-month growth.
 3. **Cumulative revenue chart (cafe):** daily running total line for the year, with milestone markers.
 4. **Cumulative revenue chart (per product):** one running-total line per product on the same axes.
-5. **Pareto chart:** revenue bars by product (descending) with a cumulative share line and an 80% reference line.
 6. **Channel breakdown:** revenue by payment method and by location, overall and per product.
-7. **Key findings:** a short written summary of the top 3–5 insights and recommended actions.
 
 ## 8. Acceptance Criteria
 
@@ -139,7 +133,6 @@ NULL values are displayed as **Unknown** in every breakdown rather than hidden, 
 - The last value of every cumulative series equals the corresponding full-period total of **dated** revenue; dated + undated revenue equals total revenue.
 - `quantity × price_per_unit = total_spent` for every row where all three are known (verified: 0 mismatches).
 - Per-product cumulative totals sum to the cafe-level cumulative total on every date.
-- The Pareto `cum_share` ends at exactly 100%.
 - Every chart has a title, labeled axes, and currency formatting for revenue.
 - Any rows excluded or adjusted for data quality are counted and documented.
 
