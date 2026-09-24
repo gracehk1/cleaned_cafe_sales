@@ -121,11 +121,10 @@ The analysis must let the owner slice every metric by:
 
 ## 7. Deliverables
 
-1. **Product summary table:** revenue, units, transactions, ATV, revenue share, and rank for each product.
+1. **Product summary table:** revenue by payment method and by location, overall and per product..
 2. **Monthly trend table and chart:** revenue and units by month, per product and total, with month-over-month growth.
-3. **Cumulative revenue chart (cafe):** daily running total line for the year, with milestone markers.
+3. **Cumulative revenue chart (overall):** daily running total line for the year, with milestone markers.
 4. **Cumulative revenue chart (per product):** one running-total line per product on the same axes.
-6. **Channel breakdown:** revenue by payment method and by location, overall and per product.
 
 ## 8. Acceptance Criteria
 
