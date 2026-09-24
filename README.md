@@ -113,66 +113,7 @@ Each fill step runs as its own `UPDATE`, so every step uses the values corrected
 - `item`, `quantity`, `price_per_unit`, and `total_spent` have no NULLs after cleaning, so revenue, units, ATV, and product totals use every row and product revenue adds up to total revenue.
 - NULLs remain only in `payment_method`, `location`, and `transaction_date`; see sections 6 and 7 for how they are handled.
 
-## 6. Cumulative Sum Requirements
-
-All cumulative sums are **running totals ordered by date** (ascending) unless stated otherwise. The ordering and grouping must be explicit so results are reproducible.
-
-### 6.1 Cumulative revenue — whole cafe
-- **Daily running total:** aggregate revenue per day, then take the cumulative sum across days.
-- **Monthly running total:** aggregate revenue per month, then take the cumulative sum across months.
-- Days with no sales must still appear (with 0 revenue) so the running total line has no gaps.
-- Rows with NULL `transaction_date` are **excluded** from all running totals (they cannot be placed in time). Their revenue ($4,173.50, 4.7% of total) is reported separately as "Undated".
-
-```python
-dated = df[df["transaction_date"].notna()]
-daily = (dated.groupby("transaction_date")["total_spent"].sum()
-           .asfreq("D", fill_value=0))
-daily_cum = daily.cumsum()
-```
-
-### 6.2 Cumulative revenue and units — per product
-- Aggregate revenue (and units) per product per day, then take the cumulative sum **within each product**, restarting for each item.
-
-```python
-by_item = (dated.groupby(["item", "transaction_date"])["total_spent"].sum()
-             .reset_index().sort_values(["item", "transaction_date"]))
-by_item["cum_revenue"] = by_item.groupby("item")["total_spent"].cumsum()
-```
-
-### 6.3 Cumulative percentage of annual total
-- `cum_pct = cumulative revenue / full-year revenue`, for the cafe and for each product.
-- Used to report the date each milestone (25% / 50% / 75% / 100%) is reached.
-
-### 6.4 Pareto (cumulative revenue share by product)
-- Sort products by revenue, **descending**, then take the cumulative sum of revenue share.
-- Flag the products that together make up at least 80% of revenue.
-
-```python
-pareto = (df.groupby("item")["total_spent"].sum()
-            .sort_values(ascending=False).to_frame("revenue"))
-pareto["share"] = pareto["revenue"] / pareto["revenue"].sum()
-pareto["cum_share"] = pareto["share"].cumsum()
-```
-
-### 6.5 Cumulative sum rules
-- Aggregate first, then accumulate (never cumsum raw transaction rows, since multiple rows share the same date and row order within a day is arbitrary).
-- The final value of every running total must equal the matching full-period total (see acceptance criteria).
-- Cumulative sums reset per year if more years of data are added later.
-- Milestone percentages (6.3) are measured against **dated** revenue, so the running total reaches exactly 100% on Dec 31.
-
-Equivalent SQL for the daily running total:
-
-```sql
-SELECT transaction_date,
-       SUM(total_spent) AS daily_revenue,
-       SUM(SUM(total_spent)) OVER (ORDER BY transaction_date) AS cum_revenue
-FROM cafe_sales_cleaned
-WHERE transaction_date IS NOT NULL
-GROUP BY transaction_date
-ORDER BY transaction_date;
-```
-
-## 7. Dimensions and Filters
+## 6. Dimensions and Filters
 
 The analysis must let the owner slice every metric by:
 - Product (`item`)
@@ -182,7 +123,7 @@ The analysis must let the owner slice every metric by:
 
 NULL values are displayed as **Unknown** in every breakdown rather than hidden, so the owner can see how much of the data each split actually covers.
 
-## 8. Deliverables
+## 7. Deliverables
 
 1. **Product summary table:** revenue, units, transactions, ATV, revenue share, and rank for each product.
 2. **Monthly trend table and chart:** revenue and units by month, per product and total, with month-over-month growth.
@@ -192,7 +133,7 @@ NULL values are displayed as **Unknown** in every breakdown rather than hidden, 
 6. **Channel breakdown:** revenue by payment method and by location, overall and per product.
 7. **Key findings:** a short written summary of the top 3–5 insights and recommended actions.
 
-## 9. Acceptance Criteria
+## 8. Acceptance Criteria
 
 - Total revenue across all outputs reconciles to `SUM(total_spent)` for the full table ($89,042.00).
 - The last value of every cumulative series equals the corresponding full-period total of **dated** revenue; dated + undated revenue equals total revenue.
@@ -202,7 +143,7 @@ NULL values are displayed as **Unknown** in every breakdown rather than hidden, 
 - Every chart has a title, labeled axes, and currency formatting for revenue.
 - Any rows excluded or adjusted for data quality are counted and documented.
 
-## 10. Data Quality Notes
+## 9. Data Quality Notes
 
 Checks on the cleaned table:
 
@@ -225,14 +166,14 @@ Remaining gaps and how the analysis treats them:
 
 Keeping these as NULL matters for the channel analysis. Filling missing payment method with "Cash" and location with "In-store" would make both look dominant. With NULLs kept, the known values are close to even (Cash 2,254 / Credit Card 2,268 / Digital Wallet 2,284; In-store 3,006 / Takeaway 3,016).
 
-## 11. Assumptions
+## 10. Assumptions
 
 - Each row is a completed sale; there are no refunds or voids in the data.
 - Prices are in a single currency and did not change during 2023.
 - Weeks start on Monday.
 - **Missing items with an ambiguous price are assigned to the more common item at that price:** $3 → Cake (not Juice), $4 → Smoothie (not Sandwich). Cake sells more than Juice, and Smoothie more than Sandwich, so these are the most likely matches. The trade-off is that a few real Juice or Sandwich sales may be counted as Cake or Smoothie. The cleaned file doesn't record which rows were filled this way; to measure the impact, run `SELECT price_per_unit, COUNT(*) FROM temp_cafe_sales WHERE item IS NULL AND price_per_unit IN (3, 4) GROUP BY 1;` between Steps 7 and 8.
 
-## 12. Out of Scope
+## 11. Out of Scope
 
 - Cost of goods, profit, and margin (no cost data available).
 - Customer-level analysis such as repeat visits (no customer ID).
