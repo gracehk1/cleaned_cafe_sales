@@ -203,10 +203,10 @@ ORDER BY months;
 --cumulative daily totals
 WITH running_daily AS(
 	SELECT 
-		EXTRACT(DAY FROM transaction_date) AS days
+		transaction_date::date AS days
 		,SUM(total_spent) AS daily_spent
 	FROM cafe_sales_cleaned
-	GROUP BY EXTRACT(DAY FROM transaction_date)
+	GROUP BY transaction_date::date
 )
 SELECT 
 	days
@@ -258,7 +258,7 @@ WITH calendar AS (
     JOIN cumulative b
         ON a.transaction_date = b.transaction_date
        AND a.item < b.item
-    WHERE a.running_revenue <> b.running_revenue
+    WHERE a.running_revenue != b.running_revenue
 ),
 changes AS (
     SELECT *
