@@ -120,10 +120,10 @@ The analysis must let the owner slice every metric by:
 - Location (In-store / Takeaway / NULL)
 
 ## 7. Deliverables
-
-1. **Product summary table:** revenue by payment method and by location, overall and per product..
-2. **Monthly trend table and chart:** revenue and units by month, per product and total, with month-over-month growth.
-3. **Cumulative revenue chart (overall):** daily running total line for the year, with milestone markers.
+Tableau Report Link: https://public.tableau.com/views/CafeSalesPerformance_17902949006210/CafeSalesPerformance?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
+1. **Product summary table:** revenue, quantity, price_per_unit by payment method, location, overall and product.
+2. **Monthly trend table and chart:** revenue, quantity, price_per_unit by month-over-month growth.
+3. **Cumulative revenue chart (overall):** daily running total line for the year
 4. **Cumulative revenue chart (per product):** one running-total line per product on the same axes.
 
 ## 8. Acceptance Criteria
